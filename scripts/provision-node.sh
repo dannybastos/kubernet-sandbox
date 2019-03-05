@@ -1,12 +1,11 @@
 locale-gen pt_BR.UTF-8
 
-echo "desabilitando swap..."
+echo "swap disable ..."
 swapoff -a
-echo "desabilitar inicializacao do swap no /etc/fstab..."
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 echo "================================"
-echo "instalação do docker..."
+echo "install docker..."
 echo "================================"
 #curl -fsSL https://get.docker.com | bash
 
@@ -16,11 +15,15 @@ apt-get update
 apt-cache policy docker-engine
 apt-get install -y docker-engine
 
-groupadd docker
+#groupadd docker
 usermod -aG docker vagrant #$USER
 
+#docker-compose
+#curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+#chmod +x /usr/local/bin/docker-compose
+
 echo "================================"
-echo "instalação do kubelet kubeadm kubectl..."
+echo "install kubelet kubeadm kubectl..."
 echo "================================"
 apt-get update && apt-get install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -38,16 +41,15 @@ cat <<EOF >/etc/docker/daemon.json
 }
 EOF
 
-#sudo --user=vagrant source <(kubectl completion bash) # setup autocomplete in bash into the current shell, bash-completion package should be installed first.
 echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc # add autocomplete permanently to your bash shell.
 
 echo "================================"
-echo "reiniciando kubelet..."
+echo "restarting kubelet..."
 echo "================================"
 systemctl daemon-reload
 systemctl restart kubelet
 systemctl restart docker
 
 echo "================================"
-echo "done!"
+echo "node done!"
 echo "================================"
