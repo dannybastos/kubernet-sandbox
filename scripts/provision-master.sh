@@ -1,5 +1,5 @@
 echo "================================"
-echo "iniciando kubernetes..."
+echo "starting kubernetes..."
 echo "================================"
 # ip of this box
 IP_ADDR=`ifconfig enp0s8 | grep Mask | awk '{print $2}'| cut -f2 -d:`
@@ -16,7 +16,7 @@ cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown $(id -u vagrant):$(id -g vagrant) /home/vagrant/.kube/config
 
 echo "================================"
-echo "instalando pod network (calico)..."
+echo "installing pod network (calico)..."
 echo "================================"
 #flannel
 #sysctl net.bridge.bridge-nf-call-iptables=1
@@ -24,8 +24,8 @@ echo "================================"
 
 #calico
 export KUBECONFIG=/etc/kubernetes/admin.conf
-kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 
 #weave
 #kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
@@ -33,8 +33,12 @@ kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/
 #systemctl restart kubelet
 #systemctl restart docker
 
-#kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+#deploy dashboard
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
 
-#echo "================================"
-#kubeadm token create --print-join-command
-#echo "================================"
+#create service-account
+kubectl apply -f dashboard-admin-user.yaml
+#create role cluster binding
+kubectl apply -f dashboard-cluster-role-binding.yaml
+#generate token
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')

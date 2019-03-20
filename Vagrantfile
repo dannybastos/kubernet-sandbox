@@ -7,8 +7,9 @@ Vagrant.configure("2") do |config|
         k8s.vm.box = "ubuntu/xenial64"
         k8s.vm.hostname = "k8s"
         k8s.vm.network :private_network, ip: "192.168.10.15", mac: "5CA1AB1E0001"
-        # k8s.vm.network :forwarded_port, guest: 22, host: 2215, id: "ssh", auto_correct:true
-        # k8s.vm.network :forwarded_port, guest: 6443, host: 6443, id: "k8s", auto_correct:true
+        k8s.vm.network :forwarded_port, guest: 22, host: 2215, id: "ssh", auto_correct:true
+        # k8s.vm.network :forwarded_port, guest: 8001, host: 8080, id: "k8s-admin", auto_correct:true
+        # k8s.vm.network :forwarded_port, guest: 31462, host: 8081, id: "app01", auto_correct:true
 
         k8s.vm.box_check_update = false
         k8s.vm.provider "virtualbox" do |v|
@@ -23,7 +24,7 @@ Vagrant.configure("2") do |config|
         node1.vm.box = "ubuntu/xenial64"
         node1.vm.hostname = "node1"
         node1.vm.network :private_network, ip: "192.168.10.16", mac: "5CA1AB1E0002"
-        # node1.vm.network :forwarded_port, guest: 22, host: 2216, id: "ssh", auto_correct:true
+        node1.vm.network :forwarded_port, guest: 22, host: 2216, id: "ssh", auto_correct:true
         node1.vm.box_check_update = false
         node1.vm.provider "virtualbox" do |v|
             v.memory = 2048
@@ -37,7 +38,7 @@ Vagrant.configure("2") do |config|
         node2.vm.box = "ubuntu/xenial64"
         node2.vm.hostname = "node2"
         node2.vm.network :private_network, ip: "192.168.10.17", mac: "5CA1AB1E0003"
-        # node2.vm.network :forwarded_port, guest: 22, host: 2217, id: "ssh", auto_correct:true
+        node2.vm.network :forwarded_port, guest: 22, host: 2217, id: "ssh", auto_correct:true
         node2.vm.box_check_update = false
         node2.vm.provider "virtualbox" do |v|
             v.memory = 2048

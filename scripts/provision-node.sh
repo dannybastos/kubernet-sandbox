@@ -1,12 +1,12 @@
 locale-gen pt_BR.UTF-8
 
-echo "desabilitando swap..."
+echo "swap disabled..."
 swapoff -a
-echo "desabilitar inicializacao do swap no /etc/fstab..."
+echo "disabled swap start in /etc/fstab..."
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 echo "================================"
-echo "instalação do docker..."
+echo "docker install..."
 echo "================================"
 #curl -fsSL https://get.docker.com | bash
 
@@ -20,7 +20,7 @@ groupadd docker
 usermod -aG docker vagrant #$USER
 
 echo "================================"
-echo "instalação do kubelet kubeadm kubectl..."
+echo "installing kubelet kubeadm kubectl..."
 echo "================================"
 apt-get update && apt-get install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -42,7 +42,7 @@ EOF
 echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc # add autocomplete permanently to your bash shell.
 
 echo "================================"
-echo "reiniciando kubelet..."
+echo "restarting kubelet..."
 echo "================================"
 systemctl daemon-reload
 systemctl restart kubelet
