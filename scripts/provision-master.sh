@@ -33,8 +33,17 @@ kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/
 #systemctl restart kubelet
 #systemctl restart docker
 
+<<<<<<< HEAD
 #deploy dashboard
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+=======
+echo "================================"
+echo "publish kubernetes dashboard ..."
+echo "================================"
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+
+>>>>>>> 5d9f1944397225feb436f7032dcb94986df9944e
 
 #create service-account
 kubectl apply -f dashboard-admin-user.yaml

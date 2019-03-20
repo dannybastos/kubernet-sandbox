@@ -7,9 +7,16 @@ Vagrant.configure("2") do |config|
         k8s.vm.box = "ubuntu/xenial64"
         k8s.vm.hostname = "k8s"
         k8s.vm.network :private_network, ip: "192.168.10.15", mac: "5CA1AB1E0001"
+<<<<<<< HEAD
         k8s.vm.network :forwarded_port, guest: 22, host: 2215, id: "ssh", auto_correct:true
         # k8s.vm.network :forwarded_port, guest: 8001, host: 8080, id: "k8s-admin", auto_correct:true
         # k8s.vm.network :forwarded_port, guest: 31462, host: 8081, id: "app01", auto_correct:true
+=======
+        # k8s.vm.network :forwarded_port, guest: 22, host: 2215, id: "ssh", auto_correct:true
+        # k8s.vm.network :forwarded_port, guest: 6443, host: 6443, id: "k8s", auto_correct:true
+        k8s.vm.network :forwarded_port, guest: 8081, host: 8081, id: "app1", auto_correct:true
+        
+>>>>>>> 5d9f1944397225feb436f7032dcb94986df9944e
 
         k8s.vm.box_check_update = false
         k8s.vm.provider "virtualbox" do |v|
