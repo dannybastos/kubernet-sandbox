@@ -1,21 +1,11 @@
 locale-gen pt_BR.UTF-8
 
-<<<<<<< HEAD
-echo "swap disabled..."
-swapoff -a
-echo "disabled swap start in /etc/fstab..."
-sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
-echo "================================"
-echo "docker install..."
-=======
-echo "swap disable ..."
+echo "swap disabled ..."
 swapoff -a
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 echo "================================"
 echo "install docker..."
->>>>>>> 5d9f1944397225feb436f7032dcb94986df9944e
 echo "================================"
 #curl -fsSL https://get.docker.com | bash
 
@@ -33,11 +23,7 @@ usermod -aG docker vagrant #$USER
 #chmod +x /usr/local/bin/docker-compose
 
 echo "================================"
-<<<<<<< HEAD
-echo "installing kubelet kubeadm kubectl..."
-=======
 echo "install kubelet kubeadm kubectl..."
->>>>>>> 5d9f1944397225feb436f7032dcb94986df9944e
 echo "================================"
 apt-get update && apt-get install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
