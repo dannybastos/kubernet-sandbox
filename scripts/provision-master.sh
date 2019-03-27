@@ -2,10 +2,8 @@ echo "================================"
 echo "starting kubernetes..."
 echo "================================"
 # ip of this box
-IP_ADDR=`ifconfig enp0s8 | grep Mask | awk '{print $2}'| cut -f2 -d:`
-# install k8s master
+IP_ADDR=`ip addr show eth1 | grep "inet " | awk '{print $2}' | cut -f1 -d/`
 HOST_NAME=$(hostname -s)
-
 echo "================================"
 kubeadm init --apiserver-advertise-address=$IP_ADDR --apiserver-cert-extra-sans=$IP_ADDR  --node-name $HOST_NAME --pod-network-cidr=192.168.0.0/16
 echo "================================"
@@ -19,29 +17,28 @@ echo "================================"
 echo "installing pod network (calico)..."
 echo "================================"
 #flannel
-#sysctl net.bridge.bridge-nf-call-iptables=1
-#sudo --user=vagrant kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
+# sudo --user=vagrant kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
 
 #calico
 export KUBECONFIG=/etc/kubernetes/admin.conf
-kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
-kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+sudo --user=vagrant kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+sudo --user=vagrant kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 
 #weave
-#kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-#systemctl daemon-reload
-#systemctl restart kubelet
-#systemctl restart docker
+#sudo --user=vagrant kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+# systemctl daemon-reload
+# systemctl restart kubelet
+# systemctl restart docker
 
 echo "================================"
 echo "publish kubernetes dashboard ..."
 echo "================================"
-kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
-kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+sudo --user=vagrant kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+sudo --user=vagrant kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
 
 #create service-account
-kubectl apply -f dashboard-admin-user.yaml
+sudo --user=vagrant kubectl apply -f /vagrant/scripts/dashboard-admin-user.yaml
 #create role cluster binding
-kubectl apply -f dashboard-cluster-role-binding.yaml
+sudo --user=vagrant kubectl apply -f /vagrant/scripts/dashboard-cluster-role-binding.yaml
 #generate token
-kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+sudo --user=vagrant kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')

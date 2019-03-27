@@ -1,4 +1,4 @@
-locale-gen pt_BR.UTF-8
+#locale-gen pt_BR.UTF-8
 
 echo "swap disabled ..."
 swapoff -a
@@ -7,13 +7,17 @@ sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 echo "================================"
 echo "install docker..."
 echo "================================"
-#curl -fsSL https://get.docker.com | bash
+yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2 wget
 
-curl -fsSL https://apt.dockerproject.org/gpg | apt-key add -
-apt-add-repository "deb https://apt.dockerproject.org/repo ubuntu-$(lsb_release -cs) main"
-apt-get update
-apt-cache policy docker-engine
-apt-get install -y docker-engine
+yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+
+yum install -y docker-ce-selinux-17.03.3.ce-1.el7 containerd.io
+systemctl enable docker.service
+systemctl start docker.service
 
 #groupadd docker
 usermod -aG docker vagrant #$USER
@@ -25,16 +29,28 @@ usermod -aG docker vagrant #$USER
 echo "================================"
 echo "install kubelet kubeadm kubectl..."
 echo "================================"
-apt-get update && apt-get install -y apt-transport-https curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kube*
 EOF
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
 
-sed -i "s/\$KUBELET_EXTRA_ARGS/\$KUBELET_EXTRA_ARGS\ --cgroup-driver=systemd/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+# Set SELinux in permissive mode (effectively disabling it)
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+
+systemctl enable --now kubelet
+
+cat <<EOF >/etc/default/kubelet
+KUBELET_EXTRA_ARGS=--cgroup-driver=systemd
+EOF
 cat <<EOF >/etc/docker/daemon.json
 {
     "exec-opts": ["native.cgroupdriver=systemd"]
@@ -42,6 +58,13 @@ cat <<EOF >/etc/docker/daemon.json
 EOF
 
 echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc # add autocomplete permanently to your bash shell.
+
+cat <<EOF >  /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+lsmod | grep br_netfilter
 
 echo "================================"
 echo "restarting kubelet..."
