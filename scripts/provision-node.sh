@@ -5,11 +5,11 @@ swapoff -a
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 echo "================================"
-echo "install docker..."
+echo "installing docker..."
 echo "================================"
 yum install -y yum-utils \
   device-mapper-persistent-data \
-  lvm2 wget
+  lvm2 wget git
 
 yum-config-manager \
     --add-repo \
@@ -23,8 +23,8 @@ systemctl start docker.service
 usermod -aG docker vagrant #$USER
 
 #docker-compose
-#curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#chmod +x /usr/local/bin/docker-compose
+curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 
 echo "================================"
 echo "install kubelet kubeadm kubectl..."
