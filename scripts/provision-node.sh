@@ -1,4 +1,9 @@
-#locale-gen pt_BR.UTF-8
+#!/usr/bin/env bash
+
+# author: Danny Bastos <https://github.com/dannybastos>
+# description: Setup a node(worker) for kubernetes
+# version: 1.0
+# license: MIT License
 
 echo "swap disabled ..."
 swapoff -a
@@ -51,9 +56,12 @@ systemctl enable --now kubelet
 cat <<EOF >/etc/default/kubelet
 KUBELET_EXTRA_ARGS=--cgroup-driver=systemd
 EOF
+
+mkdir -p /etc/docker
 cat <<EOF >/etc/docker/daemon.json
 {
-    "exec-opts": ["native.cgroupdriver=systemd"]
+  "insecure-registries": ["192.168.10.15:5000"],
+  "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
 
