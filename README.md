@@ -35,7 +35,7 @@ kubectl get service registry
 #publishing the sample-app into local registry
 git clone https://github.com/dannybastos/spring-boot-sample-app.git
 cd spring-boot-sample-app/
-set -i "s/127.0.0.1/$MASTER_IP/" docker-compose.yml
+sed -i "s/127.0.0.1/$MASTER_IP/" docker-compose.yml
 docker-compose build
 docker-compose push
 
